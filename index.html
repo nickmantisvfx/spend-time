@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, viewport-fit=cover, interactive-widget=overlays-content">
 		<title>SPEND TIME</title>
 		<style>
 html, body, #canvas {
@@ -215,6 +215,113 @@ const engine = new Engine(GODOT_CONFIG);
 	}
 }());
 		</script>
+		<!-- Telegram / iOS virtual-keyboard viewport fix.
+		     Keeps the Godot canvas at its pre-keyboard size so the keyboard overlays
+		     the lower part of the game instead of shrinking the whole UI. -->
+		<script>
+		(function () {
+			let stableWidth = Math.round(window.innerWidth);
+			let stableHeight = Math.round(window.innerHeight);
+			let keyboardOpen = false;
+
+			const root = document.documentElement;
+			const body = document.body;
+			const canvas = document.getElementById('canvas');
+
+			function viewportHeight() {
+				return window.visualViewport
+					? Math.round(window.visualViewport.height)
+					: Math.round(window.innerHeight);
+			}
+
+			function updateStableViewport() {
+				const currentH = viewportHeight();
+				const currentW = Math.round(window.innerWidth);
+
+				// Only learn a new "normal" size while the keyboard is closed.
+				if (!keyboardOpen) {
+					stableWidth = Math.max(stableWidth, currentW);
+					stableHeight = Math.max(stableHeight, currentH);
+				}
+			}
+
+			function lockGameViewport() {
+				root.style.height = stableHeight + 'px';
+				root.style.minHeight = stableHeight + 'px';
+				root.style.overflow = 'hidden';
+
+				body.style.height = stableHeight + 'px';
+				body.style.minHeight = stableHeight + 'px';
+				body.style.overflow = 'hidden';
+
+				canvas.style.width = stableWidth + 'px';
+				canvas.style.height = stableHeight + 'px';
+				canvas.style.maxWidth = 'none';
+				canvas.style.maxHeight = 'none';
+			}
+
+			function unlockGameViewport() {
+				root.style.height = '';
+				root.style.minHeight = '';
+				root.style.overflow = '';
+
+				body.style.height = '';
+				body.style.minHeight = '';
+				body.style.overflow = 'hidden';
+
+				canvas.style.width = '';
+				canvas.style.height = '';
+				canvas.style.maxWidth = '';
+				canvas.style.maxHeight = '';
+			}
+
+			function handleViewportChange() {
+				const currentH = viewportHeight();
+
+				// iOS keyboards usually reduce the visual viewport dramatically.
+				// 80% avoids treating small Telegram/header changes as a keyboard.
+				const shouldLock = currentH < stableHeight * 0.80;
+
+				if (shouldLock && !keyboardOpen) {
+					keyboardOpen = true;
+					lockGameViewport();
+				} else if (!shouldLock && keyboardOpen) {
+					keyboardOpen = false;
+					unlockGameViewport();
+
+					// Let Godot resize normally again after the keyboard closes.
+					setTimeout(updateStableViewport, 100);
+				} else if (keyboardOpen) {
+					lockGameViewport();
+				} else {
+					updateStableViewport();
+				}
+			}
+
+			window.addEventListener('orientationchange', function () {
+				keyboardOpen = false;
+				unlockGameViewport();
+				setTimeout(function () {
+					stableWidth = Math.round(window.innerWidth);
+					stableHeight = viewportHeight();
+					handleViewportChange();
+				}, 350);
+			});
+
+			window.addEventListener('resize', handleViewportChange, { passive: true });
+
+			if (window.visualViewport) {
+				window.visualViewport.addEventListener('resize', handleViewportChange, { passive: true });
+			}
+
+			// Capture the full game viewport once Telegram has settled.
+			setTimeout(function () {
+				stableWidth = Math.round(window.innerWidth);
+				stableHeight = viewportHeight();
+			}, 500);
+		}());
+		</script>
+
 	</body>
 </html>
 
