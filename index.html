@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, viewport-fit=cover, interactive-widget=overlays-content">
 		<title>SPEND TIME</title>
 		<style>
 html, body, #canvas {
@@ -21,6 +21,16 @@ body {
 #canvas {
 	display: block;
 }
+
+html, body {
+	width: 100%;
+	height: 100%;
+}
+body {
+	position: fixed;
+	inset: 0;
+}
+
 
 #canvas:focus {
 	outline: none;
@@ -111,7 +121,7 @@ body {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":true,"fileSizes":{"index.pck":35024944,"index.wasm":37902138},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":true,"fileSizes":{"index.pck":35024912,"index.wasm":37902138},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
@@ -215,6 +225,94 @@ const engine = new Engine(GODOT_CONFIG);
 	}
 }());
 		</script>
+		<!-- Telegram iOS virtual keyboard fix -->
+		<script>
+		(function () {
+			const canvas = document.getElementById('canvas');
+			const vv = window.visualViewport;
+
+			let baseInnerHeight = window.innerHeight;
+			let baseInnerWidth = window.innerWidth;
+			let keyboardOpen = false;
+
+			function refreshBaseSize() {
+				if (!keyboardOpen) {
+					baseInnerHeight = window.innerHeight;
+					baseInnerWidth = window.innerWidth;
+				}
+			}
+
+			function lockPageToPreKeyboardViewport() {
+				document.documentElement.style.width = baseInnerWidth + 'px';
+				document.documentElement.style.height = baseInnerHeight + 'px';
+
+				document.body.style.width = baseInnerWidth + 'px';
+				document.body.style.height = baseInnerHeight + 'px';
+
+				// Important: do NOT force a fixed canvas pixel size here.
+				// Godot stays on Adaptive and keeps its normal full-screen scaling.
+				canvas.style.position = 'absolute';
+				canvas.style.left = '0';
+				canvas.style.top = '0';
+			}
+
+			function unlockPageViewport() {
+				document.documentElement.style.width = '';
+				document.documentElement.style.height = '';
+
+				document.body.style.width = '';
+				document.body.style.height = '';
+
+				canvas.style.position = '';
+				canvas.style.left = '';
+				canvas.style.top = '';
+
+				setTimeout(refreshBaseSize, 120);
+			}
+
+			function handleViewport() {
+				const visualHeight = vv ? vv.height : window.innerHeight;
+
+				// Large reduction => software keyboard.
+				const nowKeyboardOpen = visualHeight < baseInnerHeight * 0.78;
+
+				if (nowKeyboardOpen && !keyboardOpen) {
+					keyboardOpen = true;
+					lockPageToPreKeyboardViewport();
+				} else if (!nowKeyboardOpen && keyboardOpen) {
+					keyboardOpen = false;
+					unlockPageViewport();
+				}
+			}
+
+			window.addEventListener('resize', function () {
+				if (!keyboardOpen) {
+					refreshBaseSize();
+				}
+				handleViewport();
+			}, { passive: true });
+
+			if (vv) {
+				vv.addEventListener('resize', handleViewport, { passive: true });
+			}
+
+			window.addEventListener('orientationchange', function () {
+				keyboardOpen = false;
+				unlockPageViewport();
+				setTimeout(function () {
+					baseInnerHeight = window.innerHeight;
+					baseInnerWidth = window.innerWidth;
+				}, 400);
+			});
+
+			// Capture Telegram's settled fullscreen viewport after launch.
+			setTimeout(function () {
+				baseInnerHeight = window.innerHeight;
+				baseInnerWidth = window.innerWidth;
+			}, 700);
+		}());
+		</script>
+
 	</body>
 </html>
 
