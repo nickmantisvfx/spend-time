@@ -7,8 +7,9 @@
   let state = {mode:''}, mode = '', lastWord = '', raf = 0, backScreen = '';
   let lastUsableHeight = window.innerHeight;
   let language = 'en';
+  let composing = false, compositionEnded = -Infinity;
   const ru = {'YOUR FIRST DAY':'ПЕРВЫЙ РАБОЧИЙ ДЕНЬ','CHOOSE YOUR BOSS':'ВЫБЕРИТЕ БОССА','NAME YOUR OFFICE':'НАЗОВИТЕ СВОЙ ОФИС','Office name':'Название офиса','OPEN COMPANY':'ОТКРЫТЬ КОМПАНИЮ','INBOX RUSH':'СРОЧНАЯ ПОЧТА','TYPE THE WORD':'ВВЕДИТЕ СЛОВО','Type the word':'Введите слово','SEND':'ОТПРАВИТЬ','TIME':'ВРЕМЯ','WORDS':'СЛОВА','Back':'Назад','Choose first boss':'Первый босс','Choose second boss':'Второй босс','Your first week is covered. Rent is 50 coins every seven days.':'Первая неделя оплачена. Далее аренда — 50 монет каждые семь дней.'};
-  const t = text => language==='ru' ? (ru[text] || text) : text;
+  const t = text => language==='zh' ? (window.SpendTimeChinese[text] || text) : language==='ru' ? (ru[text] || text) : text;
   const number = value => Number.isFinite(Number(value)) ? Math.max(0,Number(value)) : 0;
   const setText = (id,text) => { const el=document.getElementById(id); if(el.textContent!==String(text)) el.textContent=String(text); };
   function layout() {
@@ -44,10 +45,12 @@
   visualViewport?.addEventListener('scroll',scheduleLayout);
   input.addEventListener('focus',scheduleLayout); input.addEventListener('blur',scheduleLayout);
   input.addEventListener('input',()=>{submit.disabled=!input.value.trim();});
+  input.addEventListener('compositionstart',()=>{composing=true;});
+  input.addEventListener('compositionend',()=>{composing=false;compositionEnded=performance.now();});
   // Stop engine listeners seeing physical keys while a native text field owns the keyboard.
   for(const name of ['keydown','keyup','keypress']) input.addEventListener(name,event=>event.stopPropagation());
   document.getElementById('text-form').addEventListener('submit',event=>{
-    event.preventDefault(); if(!input.value.trim() || !mode) return;
+    event.preventDefault(); if(composing || performance.now()-compositionEnded<100 || !input.value.trim() || !mode) return;
     queue.push({action:'submit',value:input.value});
     if(mode==='typing') input.focus({preventScroll:true});
   });
@@ -72,7 +75,8 @@
   function update(serialized) {
     state=JSON.parse(serialized);
     const languageChanged=language!==state.language;
-    language=state.language==='ru'?'ru':'en';document.documentElement.lang=language;
+    language=['ru','zh'].includes(state.language)?state.language:'en';document.documentElement.lang=language==='zh'?'zh-Hans':language;
+    input.lang=document.documentElement.lang;
     if(mode!==state.mode || languageChanged){
       mode=state.mode; editor.hidden=!mode;canvas.style.visibility=mode?'hidden':'visible';editor.scrollTop=0;
       if(mode){
@@ -106,10 +110,10 @@
   // Local-only game: the Telegram id scopes saves on shared devices; it is not authentication.
   const user=tg?.initDataUnsafe?.user?.id || 'browser';
   const key=`spend-time:v1:${user}`;
-  try { language=JSON.parse(localStorage.getItem(key)||'{}').language==='ru'?'ru':'en'; } catch { language='en'; }
-  document.documentElement.lang=language;
-  setText('load-status',language==='ru'?'ЗАГРУЖАЕМ ВАШ ОФИС…':'LOADING YOUR OFFICE…');
-  setText('retry',language==='ru'?'ПОВТОРИТЬ':'RETRY');
+  try { const saved=JSON.parse(localStorage.getItem(key)||'{}').language;language=['ru','zh'].includes(saved)?saved:'en'; } catch { language='en'; }
+  document.documentElement.lang=language==='zh'?'zh-Hans':language;
+  setText('load-status',language==='zh'?'正在加载办公室…':language==='ru'?'ЗАГРУЖАЕМ ВАШ ОФИС…':'LOADING YOUR OFFICE…');
+  setText('retry',language==='zh'?'重试':language==='ru'?'ПОВТОРИТЬ':'RETRY');
   window.SpendTime={update,drain:()=>JSON.stringify(queue.splice(0)),
     loadProfile(slot){try{return localStorage.getItem(key+(slot?':backup':''))||'';}catch{return '';}},
     saveProfile(serialized){try{const old=localStorage.getItem(key);if(old)localStorage.setItem(key+':backup',old);localStorage.setItem(key,serialized);return true;}catch{return false;}},

@@ -25,10 +25,11 @@
 </section>
 <div id="loading" role="status"><h1>SPEND TIME</h1><p id="load-status">LOADING YOUR OFFICE…</p><progress id="load-progress"></progress><button id="retry" hidden onclick="location.reload()">RETRY</button></div>
 </main>
+<script src="zh.js"></script>
 <script src="telegram.js"></script>
 <script src="index.js"></script>
 <script>
-const config = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":36223904,"index.wasm":39514754},"focusCanvas":false,"gdextensionLibs":[],"godotPoolSize":4};
+const config = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":38622672,"index.wasm":39514754},"focusCanvas":false,"gdextensionLibs":[],"godotPoolSize":4};
 config.canvas = document.getElementById('canvas');
 config.canvasResizePolicy = 0;
 config.focusCanvas = false;
@@ -36,7 +37,7 @@ config.experimentalVK = false;
 const engine = new Engine(config);
 const missing = Engine.getMissingFeatures({threads:false});
 function fail(error) {
-  document.getElementById('load-status').textContent = document.documentElement.lang==='ru' ? 'Не удалось запустить игру. Откройте её заново в обновлённом Telegram.' : 'Could not start the game. Please reopen it in an updated Telegram app.';
+  document.getElementById('load-status').textContent = document.documentElement.lang==='zh-Hans' ? '游戏启动失败。请更新Telegram后重新打开。' : document.documentElement.lang==='ru' ? 'Не удалось запустить игру. Откройте её заново в обновлённом Telegram.' : 'Could not start the game. Please reopen it in an updated Telegram app.';
   document.getElementById('retry').hidden = false;
   console.error(error);
 }

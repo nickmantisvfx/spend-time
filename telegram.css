@@ -1,5 +1,10 @@
 @font-face{font-family:Office;src:url('Jersey10-Regular.ttf') format('truetype');font-display:swap}
 @font-face{font-family:OfficeRU;src:url('SpendOffice-Regular.ttf') format('truetype');font-display:swap}
+@font-face{font-family:OfficeZH;src:url('FusionPixel-ZH.ttf') format('truetype');font-display:swap}
+html[lang=zh-Hans] body,html[lang=zh-Hans] input,html[lang=zh-Hans] button{font-family:Office,OfficeZH,monospace}
+html[lang=zh-Hans] #rent-help{font-size:18px;line-height:1.4}
+html[lang=zh-Hans] h1{font-size:24px}
+html[lang=zh-Hans] #input-notice{font-size:16px}
 html[lang=ru] body,html[lang=ru] input,html[lang=ru] button{font-family:OfficeRU,monospace}
 html[lang=ru] #editor #back{font-size:30px}
 :root{color-scheme:light;--paper:#cec4ab;--ink:#4b4a4f;--muted:#a1998e}
