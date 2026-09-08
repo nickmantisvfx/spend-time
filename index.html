@@ -4,7 +4,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-visual">
 <meta name="theme-color" content="#cec4ab">
 <title>SPEND TIME</title>
-<link rel="stylesheet" href="telegram.css">
+<script>
+// Version the complete bundle; a cached entry page can discover the new build.
+window.SPEND_TIME_BUILD = '94b3c477496e';
+window.spendTimeReleaseReady = (async () => {
+  try {
+    const response = await fetch('release.json?check='+Date.now(), {cache:'no-store',signal:AbortSignal.timeout(4000)});
+    if (!response.ok) return true;
+    const release = await response.json();
+    if (/^[a-f0-9]{12}$/.test(release.id) && release.id!==window.SPEND_TIME_BUILD && release.entry==='play-'+release.id+'.html') {
+      const next = new URL(release.entry, location.href);
+      next.search = location.search;
+      next.hash = location.hash;
+      location.replace(next.href);
+      return false;
+    }
+  } catch (_) { /* A network interruption must not erase or block a local save. */ }
+  return true;
+})();
+</script>
+<link rel="stylesheet" href="telegram-94b3c477496e.css">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head><body>
 <main id="app">
@@ -25,11 +44,11 @@
 </section>
 <div id="loading" role="status"><h1>SPEND TIME</h1><p id="load-status">LOADING YOUR OFFICE…</p><progress id="load-progress"></progress><button id="retry" hidden onclick="location.reload()">RETRY</button></div>
 </main>
-<script src="zh.js"></script>
-<script src="telegram.js"></script>
-<script src="index.js"></script>
+<script src="zh-94b3c477496e.js"></script>
+<script src="telegram-94b3c477496e.js"></script>
+<script src="game-94b3c477496e.js"></script>
 <script>
-const config = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":38622672,"index.wasm":39514754},"focusCanvas":false,"gdextensionLibs":[],"godotPoolSize":4};
+const config = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"game-94b3c477496e","experimentalVK":false,"fileSizes":{"game-94b3c477496e.pck":41208260,"game-94b3c477496e.wasm":39514754},"focusCanvas":false,"gdextensionLibs":[],"godotPoolSize":4};
 config.canvas = document.getElementById('canvas');
 config.canvasResizePolicy = 0;
 config.focusCanvas = false;
@@ -42,9 +61,10 @@ function fail(error) {
   console.error(error);
 }
 if (missing.length) fail(missing.join(', '));
-else engine.startGame({onProgress(current,total) {
+else window.spendTimeReleaseReady.then(currentBuild => currentBuild && engine.startGame({onProgress(current,total) {
   const progress = document.getElementById('load-progress');
   if (total > 0) { progress.max=total; progress.value=current; }
-}}).then(()=>{document.getElementById('loading').hidden=true; SpendTime.ready();}).catch(fail);
+}}).then(()=>{document.getElementById('loading').hidden=true; SpendTime.ready();})).catch(fail);
 </script></body></html>
+
 

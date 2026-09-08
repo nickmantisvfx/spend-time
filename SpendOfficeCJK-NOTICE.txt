@@ -1,0 +1,11 @@
+Spend Office CJK is a renamed, modified OFL font derived from Spend Office
+(Jersey 10 with Cyrillic) and Fusion Pixel 12px Proportional zh_hans 2026.09.01.
+Latin, Cyrillic and digits retain the original Spend Office contours and metrics.
+CJK outlines are compacted and emboldened to fit the office lettering.
+
+Copyright 2023 The Soft Type Project Authors
+Copyright The Fusion Pixel Font Project Authors and its upstream font authors.
+See OFL-Jersey10.txt and OFL-FusionPixel.txt for full licenses and notices.
+Sources: https://github.com/scfried/soft-type-jersey
+         https://github.com/TakWolf/fusion-pixel-font
+Rebuild: tools/build-chinese-office-font.py (requires fonttools).
