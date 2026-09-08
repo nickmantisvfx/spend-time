@@ -27,7 +27,10 @@
     Object.assign(app.style,{left:`${offsetLeft+left}px`,top:`${offsetTop+top}px`,width:`${w}px`,height:`${h}px`});
     app.classList.toggle('compact',h<520);
     const scale=Math.min(w/384,h/720);
-    // Keep the engine's 384x720 coordinate system intact. Only CSS scales its surface.
+    // Match the backing canvas to physical pixels; Godot keeps logical input coordinates.
+    const density=Math.min(window.devicePixelRatio||1,3);
+    const pixelWidth=Math.round(384*scale*density),pixelHeight=Math.round(720*scale*density);
+    if(canvas.width!==pixelWidth || canvas.height!==pixelHeight){canvas.width=pixelWidth;canvas.height=pixelHeight;}
     Object.assign(canvas.style,{width:`${384*scale}px`,height:`${720*scale}px`,left:`${(w-384*scale)/2}px`,top:`${(h-720*scale)/2}px`});
     if(mode && document.activeElement===input) {
       const r=input.getBoundingClientRect(), bounds=app.getBoundingClientRect();

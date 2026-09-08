@@ -1,7 +1,7 @@
 @font-face{font-family:Office;src:url('Jersey10-Regular.ttf') format('truetype');font-display:swap}
-@font-face{font-family:OfficeRU;src:url('Tiny5-Regular.ttf') format('truetype');font-display:swap}
+@font-face{font-family:OfficeRU;src:url('SpendOffice-Regular.ttf') format('truetype');font-display:swap}
 html[lang=ru] body,html[lang=ru] input,html[lang=ru] button{font-family:OfficeRU,monospace}
-html[lang=ru] #editor h1{font-size:22px}html[lang=ru] #editor label{font-size:22px}html[lang=ru] #editor button{font-size:22px}html[lang=ru] #editor #back{font-size:30px}
+html[lang=ru] #editor #back{font-size:30px}
 :root{color-scheme:light;--paper:#cec4ab;--ink:#4b4a4f;--muted:#a1998e}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--paper);color:var(--ink);overscroll-behavior:none}
 body,input,button{font-family:Office,monospace}button,input{color:var(--ink)}button{cursor:pointer;-webkit-tap-highlight-color:transparent}

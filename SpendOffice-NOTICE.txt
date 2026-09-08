@@ -1,0 +1,8 @@
+Spend Office is a modified version of Jersey 10, with added Russian Cyrillic
+glyphs. Original Latin letters and digits retain Jersey 10 contours and metrics.
+The derivative family has been renamed Spend Office.
+
+Copyright 2023 The Soft Type Project Authors
+(https://github.com/scfried/soft-type-jersey)
+Distributed under the SIL Open Font License 1.1: see OFL-Jersey10.txt.
+The generation script is tools/build-office-font.py in the source archive.
