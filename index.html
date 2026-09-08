@@ -1,408 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, viewport-fit=cover, interactive-widget=overlays-content">
-		<title>SPEND TIME</title>
-		<style>
-html, body, #canvas {
-	margin: 0;
-	padding: 0;
-	border: 0;
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-visual">
+<meta name="theme-color" content="#cec4ab">
+<title>SPEND TIME</title>
+<link rel="stylesheet" href="telegram.css">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head><body>
+<main id="app">
+<canvas id="canvas" width="384" height="720" tabindex="0" aria-label="SPEND TIME game"></canvas>
+<section id="editor" hidden aria-label="Text input">
+  <header><button id="back" type="button" aria-label="Back">‹</button><h1 id="editor-title">YOUR FIRST DAY</h1></header>
+  <div id="boss-choice"><p>CHOOSE YOUR BOSS</p><div class="bosses">
+    <button type="button" data-boss="0" aria-label="Choose first boss"><canvas width="48" height="70"></canvas></button>
+    <button type="button" data-boss="1" aria-label="Choose second boss"><canvas width="48" height="70"></canvas></button>
+  </div></div>
+  <div id="typing-task" hidden><div class="stats"><span>TIME <b id="seconds">30</b></span><span>WORDS <b id="correct">0</b></span></div><div id="word" aria-live="polite"></div></div>
+  <form id="text-form" novalidate><label id="input-label" for="text-input">NAME YOUR OFFICE</label>
+    <input id="text-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" maxlength="18" placeholder="Office name">
+    <button id="submit" type="submit">OPEN COMPANY</button>
+  </form>
+  <p id="input-notice" role="status"></p>
+  <p id="rent-help">Your first week is covered. Rent is 50 coins every seven days.</p>
+</section>
+<div id="loading" role="status"><h1>SPEND TIME</h1><p id="load-status">LOADING YOUR OFFICE…</p><progress id="load-progress"></progress><button id="retry" hidden onclick="location.reload()">RETRY</button></div>
+</main>
+<script src="telegram.js"></script>
+<script src="index.js"></script>
+<script>
+const config = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":36085376,"index.wasm":39514754},"focusCanvas":false,"gdextensionLibs":[],"godotPoolSize":4};
+config.canvas = document.getElementById('canvas');
+config.canvasResizePolicy = 0;
+config.focusCanvas = false;
+config.experimentalVK = false;
+const engine = new Engine(config);
+const missing = Engine.getMissingFeatures({threads:false});
+function fail(error) {
+  document.getElementById('load-status').textContent = 'Could not start the game. Please reopen it in an updated Telegram app.';
+  document.getElementById('retry').hidden = false;
+  console.error(error);
 }
-
-body {
-	color: white;
-	background-color: black;
-	overflow: hidden;
-	touch-action: none;
-}
-
-#canvas {
-	display: block;
-}
-
-#canvas:focus {
-	outline: none;
-}
-
-#status, #status-splash, #status-progress {
-	position: absolute;
-	left: 0;
-	right: 0;
-}
-
-#status, #status-splash {
-	top: 0;
-	bottom: 0;
-}
-
-#status {
-	background-color: #242424;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	visibility: hidden;
-}
-
-#status-splash {
-	max-height: 100%;
-	max-width: 100%;
-	margin: auto;
-}
-
-#status-splash.show-image--false {
-	display: none;
-}
-
-#status-splash.fullsize--true {
-	height: 100%;
-	width: 100%;
-	object-fit: contain;
-}
-
-#status-splash.use-filter--false {
-	image-rendering: pixelated;
-}
-
-#status-progress, #status-notice {
-	display: none;
-}
-
-#status-progress {
-	bottom: 10%;
-	width: 50%;
-	margin: 0 auto;
-}
-
-#status-notice {
-	background-color: #5b3943;
-	border-radius: 0.5rem;
-	border: 1px solid #9b3943;
-	color: #e0e0e0;
-	font-family: 'Noto Sans', 'Droid Sans', Arial, sans-serif;
-	line-height: 1.3;
-	margin: 0 2rem;
-	overflow: hidden;
-	padding: 1rem;
-	text-align: center;
-	z-index: 1;
-}
-
-#game-root {
-	position: fixed;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	overflow: hidden;
-	transform-origin: 0 0;
-	will-change: transform;
-}
-		</style>
-		<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
-<link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
-
-	</head>
-	<body>
-		<div id="game-root">
-		<canvas id="canvas">
-			Your browser does not support the canvas tag.
-		</canvas>
-
-		<noscript>
-			Your browser does not support JavaScript.
-		</noscript>
-
-		<div id="status">
-			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="index.png" alt="">
-			<progress id="status-progress"></progress>
-			<div id="status-notice"></div>
-		</div>
-		</div>
-
-		<script src="index.js"></script>
-		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":true,"fileSizes":{"index.pck":35024912,"index.wasm":37902138},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
-const GODOT_THREADS_ENABLED = false;
-const engine = new Engine(GODOT_CONFIG);
-
-(function () {
-	const statusOverlay = document.getElementById('status');
-	const statusProgress = document.getElementById('status-progress');
-	const statusNotice = document.getElementById('status-notice');
-
-	let initializing = true;
-	let statusMode = '';
-
-	function setStatusMode(mode) {
-		if (statusMode === mode || !initializing) {
-			return;
-		}
-		if (mode === 'hidden') {
-			statusOverlay.remove();
-			initializing = false;
-			return;
-		}
-		statusOverlay.style.visibility = 'visible';
-		statusProgress.style.display = mode === 'progress' ? 'block' : 'none';
-		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
-		statusMode = mode;
-	}
-
-	function setStatusNotice(text) {
-		while (statusNotice.lastChild) {
-			statusNotice.removeChild(statusNotice.lastChild);
-		}
-		const lines = text.split('\n');
-		lines.forEach((line) => {
-			statusNotice.appendChild(document.createTextNode(line));
-			statusNotice.appendChild(document.createElement('br'));
-		});
-	}
-
-	function displayFailureNotice(err) {
-		console.error(err);
-		if (err instanceof Error) {
-			setStatusNotice(err.message);
-		} else if (typeof err === 'string') {
-			setStatusNotice(err);
-		} else {
-			setStatusNotice('An unknown error occurred.');
-		}
-		setStatusMode('notice');
-		initializing = false;
-	}
-
-	const missing = Engine.getMissingFeatures({
-		threads: GODOT_THREADS_ENABLED,
-	});
-
-	if (missing.length !== 0) {
-		if (GODOT_CONFIG['serviceWorker'] && GODOT_CONFIG['ensureCrossOriginIsolationHeaders'] && 'serviceWorker' in navigator) {
-			let serviceWorkerRegistrationPromise;
-			try {
-				serviceWorkerRegistrationPromise = navigator.serviceWorker.getRegistration();
-			} catch (err) {
-				serviceWorkerRegistrationPromise = Promise.reject(new Error('Service worker registration failed.'));
-			}
-			// There's a chance that installing the service worker would fix the issue
-			Promise.race([
-				serviceWorkerRegistrationPromise.then((registration) => {
-					if (registration != null) {
-						return Promise.reject(new Error('Service worker already exists.'));
-					}
-					return registration;
-				}).then(() => engine.installServiceWorker()),
-				// For some reason, `getRegistration()` can stall
-				new Promise((resolve) => {
-					setTimeout(() => resolve(), 2000);
-				}),
-			]).then(() => {
-				// Reload if there was no error.
-				window.location.reload();
-			}).catch((err) => {
-				console.error('Error while registering service worker:', err);
-			});
-		} else {
-			// Display the message as usual
-			const missingMsg = 'Error\nThe following features required to run Godot projects on the Web are missing:\n';
-			displayFailureNotice(missingMsg + missing.join('\n'));
-		}
-	} else {
-		setStatusMode('progress');
-		engine.startGame({
-			'onProgress': function (current, total) {
-				if (current > 0 && total > 0) {
-					statusProgress.value = current;
-					statusProgress.max = total;
-				} else {
-					statusProgress.removeAttribute('value');
-					statusProgress.removeAttribute('max');
-				}
-			},
-		}).then(() => {
-			setStatusMode('hidden');
-		}, displayFailureNotice);
-	}
-}());
-		</script>
-		<!-- Telegram iOS keyboard hard-fix: freeze Godot canvas while the keyboard is open. -->
-		<script>
-		(function () {
-			const root = document.getElementById('game-root');
-			const canvas = document.getElementById('canvas');
-			const vv = window.visualViewport;
-
-			let keyboardOpen = false;
-			let rafId = 0;
-
-			let stableViewportWidth = 0;
-			let stableViewportHeight = 0;
-			let stableCanvas = null;
-
-			function currentVisualHeight() {
-				return vv ? vv.height : window.innerHeight;
-			}
-
-			function captureStableGeometry() {
-				if (keyboardOpen) return;
-
-				const rect = canvas.getBoundingClientRect();
-				const vh = currentVisualHeight();
-				const vw = vv ? vv.width : window.innerWidth;
-
-				// Ignore transient zero/tiny Telegram layout states.
-				if (rect.width < 50 || rect.height < 50 || vh < 100 || vw < 100) return;
-
-				stableViewportWidth = Math.max(stableViewportWidth, vw);
-				stableViewportHeight = Math.max(stableViewportHeight, vh);
-
-				stableCanvas = {
-					left: rect.left,
-					top: rect.top,
-					cssWidth: rect.width,
-					cssHeight: rect.height,
-					pixelWidth: canvas.width,
-					pixelHeight: canvas.height,
-					style: canvas.getAttribute('style')
-				};
-			}
-
-			function keyboardLooksOpen() {
-				if (!stableViewportHeight) return false;
-				return currentVisualHeight() < stableViewportHeight * 0.82;
-			}
-
-			function visualPanY() {
-				let pan = 0;
-
-				if (vv) {
-					// WebKit can pan the visual viewport without changing scrollTop.
-					pan = Math.max(
-						pan,
-						Number(vv.offsetTop) || 0,
-						(Number(vv.pageTop) || 0) - (window.scrollY || 0)
-					);
-				}
-
-				// On affected iOS/WKWebView versions the body rect can expose
-				// the native visual pan more accurately than offsetTop.
-				const bodyTop = document.body.getBoundingClientRect().top;
-				if (bodyTop < 0) {
-					pan = Math.max(pan, -bodyTop);
-				}
-
-				return Math.max(0, pan);
-			}
-
-			function freezeFrame() {
-				if (!keyboardOpen || !stableCanvas) return;
-
-				root.style.setProperty('width', stableViewportWidth + 'px', 'important');
-				root.style.setProperty('height', stableViewportHeight + 'px', 'important');
-				root.style.setProperty('transform', 'translate3d(0,' + visualPanY() + 'px,0)', 'important');
-
-				canvas.style.setProperty('position', 'absolute', 'important');
-				canvas.style.setProperty('left', stableCanvas.left + 'px', 'important');
-				canvas.style.setProperty('top', stableCanvas.top + 'px', 'important');
-				canvas.style.setProperty('width', stableCanvas.cssWidth + 'px', 'important');
-				canvas.style.setProperty('height', stableCanvas.cssHeight + 'px', 'important');
-				canvas.style.setProperty('max-width', 'none', 'important');
-				canvas.style.setProperty('max-height', 'none', 'important');
-
-				// Godot Adaptive may alter the canvas backing size after a viewport resize.
-				// Restore the pre-keyboard backing size so the project viewport does not shrink.
-				if (canvas.width !== stableCanvas.pixelWidth) {
-					canvas.width = stableCanvas.pixelWidth;
-				}
-				if (canvas.height !== stableCanvas.pixelHeight) {
-					canvas.height = stableCanvas.pixelHeight;
-				}
-
-				rafId = requestAnimationFrame(freezeFrame);
-			}
-
-			function enterKeyboardMode() {
-				if (keyboardOpen || !stableCanvas) return;
-				keyboardOpen = true;
-				cancelAnimationFrame(rafId);
-				freezeFrame();
-			}
-
-			function leaveKeyboardMode() {
-				if (!keyboardOpen) return;
-				keyboardOpen = false;
-				cancelAnimationFrame(rafId);
-
-				root.style.removeProperty('width');
-				root.style.removeProperty('height');
-				root.style.removeProperty('transform');
-
-				if (stableCanvas.style === null) {
-					canvas.removeAttribute('style');
-				} else {
-					canvas.setAttribute('style', stableCanvas.style);
-				}
-
-				canvas.width = stableCanvas.pixelWidth;
-				canvas.height = stableCanvas.pixelHeight;
-
-				// Give Telegram/WKWebView time to restore its viewport,
-				// then let Godot Adaptive calculate the normal full-screen size again.
-				setTimeout(function () {
-					window.dispatchEvent(new Event('resize'));
-					stableViewportWidth = 0;
-					stableViewportHeight = 0;
-					setTimeout(captureStableGeometry, 250);
-				}, 150);
-			}
-
-			function handleViewportChange() {
-				if (keyboardLooksOpen()) {
-					enterKeyboardMode();
-				} else if (keyboardOpen) {
-					leaveKeyboardMode();
-				} else {
-					captureStableGeometry();
-				}
-			}
-
-			window.addEventListener('resize', handleViewportChange, { passive: true });
-			window.addEventListener('scroll', handleViewportChange, { passive: true });
-
-			if (vv) {
-				vv.addEventListener('resize', handleViewportChange, { passive: true });
-				vv.addEventListener('scroll', function () {
-					if (keyboardOpen) {
-						root.style.setProperty(
-							'transform',
-							'translate3d(0,' + visualPanY() + 'px,0)',
-							'important'
-						);
-					}
-				}, { passive: true });
-			}
-
-			window.addEventListener('orientationchange', function () {
-				cancelAnimationFrame(rafId);
-				keyboardOpen = false;
-				root.style.removeProperty('width');
-				root.style.removeProperty('height');
-				root.style.removeProperty('transform');
-				stableViewportWidth = 0;
-				stableViewportHeight = 0;
-				stableCanvas = null;
-				setTimeout(captureStableGeometry, 600);
-			});
-
-			// Capture after Telegram fullscreen/header animation and Godot startup settle.
-			setTimeout(captureStableGeometry, 800);
-			setTimeout(captureStableGeometry, 1400);
-		}());
-		</script>
-
-	</body>
-</html>
+if (missing.length) fail(missing.join(', '));
+else engine.startGame({onProgress(current,total) {
+  const progress = document.getElementById('load-progress');
+  if (total > 0) { progress.max=total; progress.value=current; }
+}}).then(()=>{document.getElementById('loading').hidden=true; SpendTime.ready();}).catch(fail);
+</script></body></html>
 
