@@ -28,7 +28,7 @@
 <script src="telegram.js"></script>
 <script src="index.js"></script>
 <script>
-const config = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":36085376,"index.wasm":39514754},"focusCanvas":false,"gdextensionLibs":[],"godotPoolSize":4};
+const config = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":36183840,"index.wasm":39514754},"focusCanvas":false,"gdextensionLibs":[],"godotPoolSize":4};
 config.canvas = document.getElementById('canvas');
 config.canvasResizePolicy = 0;
 config.focusCanvas = false;
@@ -36,7 +36,7 @@ config.experimentalVK = false;
 const engine = new Engine(config);
 const missing = Engine.getMissingFeatures({threads:false});
 function fail(error) {
-  document.getElementById('load-status').textContent = 'Could not start the game. Please reopen it in an updated Telegram app.';
+  document.getElementById('load-status').textContent = document.documentElement.lang==='ru' ? 'Не удалось запустить игру. Откройте её заново в обновлённом Telegram.' : 'Could not start the game. Please reopen it in an updated Telegram app.';
   document.getElementById('retry').hidden = false;
   console.error(error);
 }

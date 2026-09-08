@@ -6,6 +6,9 @@
   const submit = document.getElementById('submit'), queue = [];
   let state = {mode:''}, mode = '', lastWord = '', raf = 0, backScreen = '';
   let lastUsableHeight = window.innerHeight;
+  let language = 'en';
+  const ru = {'YOUR FIRST DAY':'ПЕРВЫЙ РАБОЧИЙ ДЕНЬ','CHOOSE YOUR BOSS':'ВЫБЕРИТЕ БОССА','NAME YOUR OFFICE':'НАЗОВИТЕ СВОЙ ОФИС','Office name':'Название офиса','OPEN COMPANY':'ОТКРЫТЬ КОМПАНИЮ','INBOX RUSH':'СРОЧНАЯ ПОЧТА','TYPE THE WORD':'ВВЕДИТЕ СЛОВО','Type the word':'Введите слово','SEND':'ОТПРАВИТЬ','TIME':'ВРЕМЯ','WORDS':'СЛОВА','Back':'Назад','Choose first boss':'Первый босс','Choose second boss':'Второй босс','Your first week is covered. Rent is 50 coins every seven days.':'Первая неделя оплачена. Далее аренда — 50 монет каждые семь дней.'};
+  const t = text => language==='ru' ? (ru[text] || text) : text;
   const number = value => Number.isFinite(Number(value)) ? Math.max(0,Number(value)) : 0;
   const setText = (id,text) => { const el=document.getElementById(id); if(el.textContent!==String(text)) el.textContent=String(text); };
   function layout() {
@@ -65,18 +68,26 @@
   }; image.src='office-atlas-key.png';
   function update(serialized) {
     state=JSON.parse(serialized);
-    if(mode!==state.mode){
+    const languageChanged=language!==state.language;
+    language=state.language==='ru'?'ru':'en';document.documentElement.lang=language;
+    if(mode!==state.mode || languageChanged){
       mode=state.mode; editor.hidden=!mode;canvas.style.visibility=mode?'hidden':'visible';editor.scrollTop=0;
       if(mode){
         const naming=mode==='name';input.value=naming?state.name:'';
-        input.maxLength=naming?18:24;input.placeholder=naming?'Office name':'Type the word';
+        input.maxLength=naming?18:24;input.placeholder=t(naming?'Office name':'Type the word');
         input.enterKeyHint=naming?'go':'send';
         document.getElementById('boss-choice').hidden=!naming;
         document.getElementById('typing-task').hidden=naming;
         document.getElementById('rent-help').hidden=!naming;
-        setText('editor-title',naming?'YOUR FIRST DAY':'INBOX RUSH');
-        setText('input-label',naming?'NAME YOUR OFFICE':'TYPE THE WORD');
-        setText('submit',naming?'OPEN COMPANY':'SEND');lastWord=state.wordIndex;
+        setText('editor-title',t(naming?'YOUR FIRST DAY':'INBOX RUSH'));
+        setText('input-label',t(naming?'NAME YOUR OFFICE':'TYPE THE WORD'));
+        setText('submit',t(naming?'OPEN COMPANY':'SEND'));lastWord=state.wordIndex;
+        document.querySelector('#boss-choice p').textContent=t('CHOOSE YOUR BOSS');
+        document.querySelector('#typing-task .stats span:first-child').firstChild.textContent=t('TIME')+' ';
+        document.querySelector('#typing-task .stats span:last-child').firstChild.textContent=t('WORDS')+' ';
+        setText('rent-help',t('Your first week is covered. Rent is 50 coins every seven days.'));
+        document.getElementById('back').setAttribute('aria-label',t('Back'));
+        for(const button of document.querySelectorAll('[data-boss]'))button.setAttribute('aria-label',t(button.dataset.boss==='0'?'Choose first boss':'Choose second boss'));
         // A real tap on this visible field opens iOS's keyboard. No delayed autofocus.
       }else{input.blur();tg?.hideKeyboard?.();}
       scheduleLayout();
@@ -92,6 +103,10 @@
   // Local-only game: the Telegram id scopes saves on shared devices; it is not authentication.
   const user=tg?.initDataUnsafe?.user?.id || 'browser';
   const key=`spend-time:v1:${user}`;
+  try { language=JSON.parse(localStorage.getItem(key)||'{}').language==='ru'?'ru':'en'; } catch { language='en'; }
+  document.documentElement.lang=language;
+  setText('load-status',language==='ru'?'ЗАГРУЖАЕМ ВАШ ОФИС…':'LOADING YOUR OFFICE…');
+  setText('retry',language==='ru'?'ПОВТОРИТЬ':'RETRY');
   window.SpendTime={update,drain:()=>JSON.stringify(queue.splice(0)),
     loadProfile(slot){try{return localStorage.getItem(key+(slot?':backup':''))||'';}catch{return '';}},
     saveProfile(serialized){try{const old=localStorage.getItem(key);if(old)localStorage.setItem(key+':backup',old);localStorage.setItem(key,serialized);return true;}catch{return false;}},
