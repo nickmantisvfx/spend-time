@@ -6,7 +6,7 @@
 <title>SPEND TIME</title>
 <script>
 // Version the complete bundle; a cached entry page can discover the new build.
-window.SPEND_TIME_BUILD = '94b3c477496e';
+window.SPEND_TIME_BUILD = '96ef420eba97';
 window.spendTimeReleaseReady = (async () => {
   try {
     const response = await fetch('release.json?check='+Date.now(), {cache:'no-store',signal:AbortSignal.timeout(4000)});
@@ -23,7 +23,7 @@ window.spendTimeReleaseReady = (async () => {
   return true;
 })();
 </script>
-<link rel="stylesheet" href="telegram-94b3c477496e.css">
+<link rel="stylesheet" href="telegram-96ef420eba97.css">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head><body>
 <main id="app">
@@ -40,15 +40,15 @@ window.spendTimeReleaseReady = (async () => {
     <button id="submit" type="submit">OPEN COMPANY</button>
   </form>
   <p id="input-notice" role="status"></p>
-  <p id="rent-help">Your first week is covered. Rent is 50 coins every seven days.</p>
+  <p id="rent-help">Rent is 50 coins each game week: seven new levels completed.</p>
 </section>
 <div id="loading" role="status"><h1>SPEND TIME</h1><p id="load-status">LOADING YOUR OFFICE…</p><progress id="load-progress"></progress><button id="retry" hidden onclick="location.reload()">RETRY</button></div>
 </main>
-<script src="zh-94b3c477496e.js"></script>
-<script src="telegram-94b3c477496e.js"></script>
-<script src="game-94b3c477496e.js"></script>
+<script src="locales-96ef420eba97.js"></script>
+<script src="telegram-96ef420eba97.js"></script>
+<script src="game-96ef420eba97.js"></script>
 <script>
-const config = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"game-94b3c477496e","experimentalVK":false,"fileSizes":{"game-94b3c477496e.pck":41208260,"game-94b3c477496e.wasm":39514754},"focusCanvas":false,"gdextensionLibs":[],"godotPoolSize":4};
+const config = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"game-96ef420eba97","experimentalVK":false,"fileSizes":{"game-96ef420eba97.pck":44209900,"game-96ef420eba97.wasm":39514754},"focusCanvas":false,"gdextensionLibs":[],"godotPoolSize":4};
 config.canvas = document.getElementById('canvas');
 config.canvasResizePolicy = 0;
 config.focusCanvas = false;
@@ -56,7 +56,7 @@ config.experimentalVK = false;
 const engine = new Engine(config);
 const missing = Engine.getMissingFeatures({threads:false});
 function fail(error) {
-  document.getElementById('load-status').textContent = document.documentElement.lang==='zh-Hans' ? '游戏启动失败。请更新Telegram后重新打开。' : document.documentElement.lang==='ru' ? 'Не удалось запустить игру. Откройте её заново в обновлённом Telegram.' : 'Could not start the game. Please reopen it in an updated Telegram app.';
+  document.getElementById('load-status').textContent = window.spendTimeText('LOAD_ERROR');
   document.getElementById('retry').hidden = false;
   console.error(error);
 }

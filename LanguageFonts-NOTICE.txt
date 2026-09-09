@@ -1,0 +1,14 @@
+Spend Office JP and KR: renamed modifications of Fusion Pixel 12px
+Proportional ja and ko, release 2026.09.01, combined with Spend Office.
+Contours are compacted and emboldened; original office Latin and digits remain.
+Copyright The Fusion Pixel Font Project Authors and upstream authors.
+See OFL-FusionPixel.txt and OFL-Jersey10.txt for complete licenses and notices.
+
+Spend Office Arabic: renamed modification of Handjet (Rosetta Type).
+Static weight 800, ELGR 2, ELSH 2. Arabic shaping tables are preserved.
+Latin/Cyrillic letters and digits are replaced by scaled Spend Office outlines.
+Copyright 2018 The Handjet Project Authors (https://github.com/rosettatype/Handjet).
+See OFL-Handjet.txt and OFL-Jersey10.txt for complete licenses and notices.
+
+All derived font software is distributed under SIL Open Font License 1.1.
+Build scripts: tools/build-JP-font.py, build-KR-font.py, build-arabic-font.py.
