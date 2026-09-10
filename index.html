@@ -6,7 +6,7 @@
 <title>SPEND TIME</title>
 <script>
 // Version the complete bundle; a cached entry page can discover the new build.
-window.SPEND_TIME_BUILD = '4f3d2a4cb599';
+window.SPEND_TIME_BUILD = '0ff73b28db04';
 window.spendTimeReleaseReady = (async () => {
   try {
     const response = await fetch('release.json?check='+Date.now(), {cache:'no-store',signal:AbortSignal.timeout(4000)});
@@ -23,8 +23,15 @@ window.spendTimeReleaseReady = (async () => {
   return true;
 })();
 </script>
-<link rel="stylesheet" href="telegram-4f3d2a4cb599.css">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="telegram-0ff73b28db04.css">
+<script>
+window.spendTimeTelegramReady = new Promise(resolve => {
+ const sdk=document.createElement('script');sdk.src='https://telegram.org/js/telegram-web-app.js';
+ const timer=setTimeout(()=>resolve(false),8000);
+ sdk.onload=()=>{clearTimeout(timer);resolve(true)};sdk.onerror=()=>{clearTimeout(timer);resolve(false)};
+ document.head.appendChild(sdk);
+});
+</script>
 </head><body>
 <main id="app">
 <canvas id="canvas" width="384" height="720" tabindex="0" aria-label="SPEND TIME game"></canvas>
@@ -42,29 +49,44 @@ window.spendTimeReleaseReady = (async () => {
   <p id="input-notice" role="status"></p>
   <p id="rent-help">Rent is 50 coins each game week: seven new levels completed.</p>
 </section>
-<div id="loading" role="status"><h1>SPEND TIME</h1><p id="load-status">LOADING YOUR OFFICE…</p><progress id="load-progress"></progress><button id="retry" hidden onclick="location.reload()">RETRY</button></div>
+<div id="loading" role="status"><h1>SPEND TIME</h1><p id="load-status">LOADING YOUR OFFICE…</p><progress id="load-progress"></progress><p id="load-bytes"></p><button id="retry" hidden onclick="location.reload()">RETRY</button></div>
 </main>
-<script src="locales-4f3d2a4cb599.js"></script>
-<script src="telegram-4f3d2a4cb599.js"></script>
-<script src="game-4f3d2a4cb599.js"></script>
+<script src="locales-0ff73b28db04.js"></script>
+<script id="telegram-shell" data-src="telegram-0ff73b28db04.js"></script>
+<script src="loader-0ff73b28db04.js"></script>
+<script src="game-0ff73b28db04.js"></script>
 <script>
-const config = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"game-4f3d2a4cb599","experimentalVK":false,"fileSizes":{"game-4f3d2a4cb599.pck":44312748,"game-4f3d2a4cb599.wasm":39514754},"focusCanvas":false,"gdextensionLibs":[],"godotPoolSize":4};
+const config = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"game-0ff73b28db04","experimentalVK":false,"fileSizes":{"game-0ff73b28db04.pck":12583148,"game-0ff73b28db04.wasm":39514754},"focusCanvas":false,"gdextensionLibs":[],"godotPoolSize":4};
 config.canvas = document.getElementById('canvas');
 config.canvasResizePolicy = 0;
 config.focusCanvas = false;
 config.experimentalVK = false;
-const engine = new Engine(config);
-const missing = Engine.getMissingFeatures({threads:false});
+let transport, watchdog, loadFailed=false;
 function fail(error) {
-  document.getElementById('load-status').textContent = window.spendTimeText('LOAD_ERROR');
+  if(loadFailed)return;
+  loadFailed=true;
+  clearInterval(watchdog);if(transport)transport.stop();
+  document.getElementById('load-status').textContent = window.spendTimeText?.('LOAD_ERROR') || 'Connection interrupted. Please retry.';
   document.getElementById('retry').hidden = false;
   console.error(error);
 }
-if (missing.length) fail(missing.join(', '));
-else window.spendTimeReleaseReady.then(currentBuild => currentBuild && engine.startGame({onProgress(current,total) {
-  const progress = document.getElementById('load-progress');
-  if (total > 0) { progress.max=total; progress.value=current; }
-}}).then(()=>{document.getElementById('loading').hidden=true; SpendTime.ready();})).catch(fail);
+window.addEventListener('spend-time-load-error',event=>fail(event.detail));
+(async()=>{
+ if(!await window.spendTimeReleaseReady)return;
+ const sdkReady=await window.spendTimeTelegramReady;
+ if(!sdkReady && /tgWebAppData/.test(location.hash+location.search))throw Error('Telegram SDK unavailable');
+ await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=document.getElementById('telegram-shell').dataset.src;s.onload=resolve;s.onerror=reject;document.body.appendChild(s)});
+ const missing=Engine.getMissingFeatures({threads:false});if(missing.length)throw Error(missing.join(', '));
+ transport=window.installSpendTimeTransport(config,{"game-0ff73b28db04.pck":{"rawSize":12583148,"file":"game-0ff73b28db04.pck.gz","size":11462719},"game-0ff73b28db04.wasm":{"rawSize":39514754,"file":"engine-fc74679e3b97.wasm.gz","size":10074695}});
+ watchdog=setInterval(()=>{if(transport.stalled())fail(new Error('Loading timed out'));},1000);
+ const engine=new Engine(config);
+ await engine.startGame({onProgress(current,total){
+  if(!('DecompressionStream' in window)){transport.touch();const p=document.getElementById('load-progress');if(total>0){p.max=total;p.value=current;}}
+ }});
+ if(loadFailed)return;
+ clearInterval(watchdog);await transport.done();
+ document.getElementById('loading').hidden=true;SpendTime.ready();
+})().catch(fail);
 </script></body></html>
 
 

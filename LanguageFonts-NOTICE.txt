@@ -12,3 +12,5 @@ See OFL-Handjet.txt and OFL-Jersey10.txt for complete licenses and notices.
 
 All derived font software is distributed under SIL Open Font License 1.1.
 Build scripts: tools/build-JP-font.py, build-KR-font.py, build-arabic-font.py.
+
+Runtime optimization: JP and KR retain their original outlines for translated text and native syllabaries. Additional Han input uses the complete SpendOfficeCJK fallback. Original font licenses remain included.
