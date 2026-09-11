@@ -6,7 +6,7 @@
 <title>SPEND TIME</title>
 <script>
 // Version the complete bundle; a cached entry page can discover the new build.
-window.SPEND_TIME_BUILD = '988be700f8ca';
+window.SPEND_TIME_BUILD = '65ef9d2d3b98';
 window.spendTimeReleaseReady = (async () => {
   try {
     const response = await fetch('release.json?check='+Date.now(), {cache:'no-store',signal:AbortSignal.timeout(4000)});
@@ -23,7 +23,7 @@ window.spendTimeReleaseReady = (async () => {
   return true;
 })();
 </script>
-<link rel="stylesheet" href="telegram-988be700f8ca.css">
+<link rel="stylesheet" href="telegram-65ef9d2d3b98.css">
 <script>
 window.spendTimeTelegramReady = new Promise(resolve => {
  const sdk=document.createElement('script');sdk.src='https://telegram.org/js/telegram-web-app.js';
@@ -51,12 +51,12 @@ window.spendTimeTelegramReady = new Promise(resolve => {
 </section>
 <div id="loading" role="status"><h1>SPEND TIME</h1><p id="load-status">LOADING YOUR OFFICE…</p><progress id="load-progress"></progress><p id="load-bytes"></p><button id="retry" hidden onclick="location.reload()">RETRY</button></div>
 </main>
-<script src="locales-988be700f8ca.js"></script>
-<script id="telegram-shell" data-src="telegram-988be700f8ca.js"></script>
-<script src="loader-988be700f8ca.js"></script>
-<script src="game-988be700f8ca.js"></script>
+<script src="locales-65ef9d2d3b98.js"></script>
+<script id="telegram-shell" data-src="telegram-65ef9d2d3b98.js"></script>
+<script src="loader-65ef9d2d3b98.js"></script>
+<script src="game-65ef9d2d3b98.js"></script>
 <script>
-const config = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"game-988be700f8ca","experimentalVK":false,"fileSizes":{"game-988be700f8ca.pck":13972212,"game-988be700f8ca.wasm":39514754},"focusCanvas":false,"gdextensionLibs":[],"godotPoolSize":4};
+const config = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"game-65ef9d2d3b98","experimentalVK":false,"fileSizes":{"game-65ef9d2d3b98.pck":15401552,"game-65ef9d2d3b98.wasm":39514754},"focusCanvas":false,"gdextensionLibs":[],"godotPoolSize":4};
 config.canvas = document.getElementById('canvas');
 config.canvasResizePolicy = 0;
 config.focusCanvas = false;
@@ -77,7 +77,7 @@ window.addEventListener('spend-time-load-error',event=>fail(event.detail));
  if(!sdkReady && /tgWebAppData/.test(location.hash+location.search))throw Error('Telegram SDK unavailable');
  await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=document.getElementById('telegram-shell').dataset.src;s.onload=resolve;s.onerror=reject;document.body.appendChild(s)});
  const missing=Engine.getMissingFeatures({threads:false});if(missing.length)throw Error(missing.join(', '));
- transport=window.installSpendTimeTransport(config,{"game-988be700f8ca.pck":{"file":"game-988be700f8ca.pck.gz","rawSize":13972212,"size":12754629},"game-988be700f8ca.wasm":{"file":"engine-fc74679e3b97.wasm.gz","rawSize":39514754,"size":10074695}});
+ transport=window.installSpendTimeTransport(config,{"game-65ef9d2d3b98.pck":{"file":"game-65ef9d2d3b98.pck.gz","rawSize":15401552,"size":14044828},"game-65ef9d2d3b98.wasm":{"file":"engine-fc74679e3b97.wasm.gz","rawSize":39514754,"size":10074695}});
  watchdog=setInterval(()=>{if(transport.stalled())fail(new Error('Loading timed out'));},1000);
  const engine=new Engine(config);
  await engine.startGame({onProgress(current,total){
